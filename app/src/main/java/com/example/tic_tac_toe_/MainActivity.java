@@ -4,11 +4,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    Button reset;
     TextView t1;
     boolean gameactive=true;
     //player representation
@@ -16,22 +22,25 @@ public class MainActivity extends AppCompatActivity {
     //1 - X
     //2-null
     int activeplayer=0;
+    int count=0;
     int[] gamestate={2,2,2,2,2,2,2,2,2};  //initially 2 means null neighther O nor X
     int [][] winposition={{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
 
-    public void playerTap(View view)
-    {
+    public void playerTap(View view) throws InterruptedException {
         ImageView img=(ImageView) view;
         int tappedimg=Integer.parseInt(img.getTag().toString());
         if(!gameactive)
         {
             gamereset(view);
         }
+
         if(gamestate[tappedimg]==2 && gameactive)
         {
             t1=(TextView)findViewById(R.id.status);
             gamestate[tappedimg]=activeplayer;
             img.setTranslationY(-100f);
+            count++;
+
             if(activeplayer==0)
             {
                 img.setImageResource(R.drawable.o);
@@ -61,8 +70,20 @@ public class MainActivity extends AppCompatActivity {
                     winner="X is winner";
                 }
                 t1.setText(winner);
+
             }
             ;
+        }
+        if(count >=9 )
+        {
+            if(t1.getText().toString() =="X's turn tap to play")
+            {
+
+                Toast.makeText(this, "No winner ", Toast.LENGTH_SHORT).show();
+                gameactive=false;
+
+
+            }
         }
 
 
@@ -70,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     public void gamereset(View view)
     {
         gameactive=true;
+        count=0;
         activeplayer=0;
         for(int i=0;i<gamestate.length;i++)
         {
@@ -90,5 +112,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().hide();
+        reset=findViewById(R.id.reset_btn);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gamereset(view);
+            }
+        });
     }
 }
